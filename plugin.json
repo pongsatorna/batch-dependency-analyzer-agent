@@ -5,6 +5,7 @@
   "author": "Antigravity",
   "skills": [
     "csv-batch-ingester",
-    "sql-column-lineage-parser"
+    "sql-column-lineage-parser",
+    "job-dependency-classifier"
   ]
 }
