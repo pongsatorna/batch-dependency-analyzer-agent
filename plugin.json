@@ -4,6 +4,7 @@
   "description": "A set of composable skills to analyze PostgreSQL batch jobs and classify their data dependencies.",
   "author": "Antigravity",
   "skills": [
-    "csv-batch-ingester"
+    "csv-batch-ingester",
+    "sql-column-lineage-parser"
   ]
 }
