@@ -41,7 +41,7 @@ def ingest_csv(file_path: str):
         sys.exit(1)
 
 if __name__ == "__main__":
-    target_file = "Check-In-Batch-Job.csv"
+    target_file = "batch_jobs.csv"
     if len(sys.argv) > 1:
         target_file = sys.argv[1]
     

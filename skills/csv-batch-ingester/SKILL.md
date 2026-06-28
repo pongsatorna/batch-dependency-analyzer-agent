@@ -1,16 +1,16 @@
 ---
 name: csv-batch-ingester
-description: Reads, validates, and sanitizes batch job data from Check-In-Batch-Job.csv.
+description: Reads, validates, and sanitizes batch job data from batch_jobs.csv.
 ---
 
 # `csv-batch-ingester` Skill
 
 ## Description (Layer 1)
-This skill handles the ingestion of batch job data from a CSV file. It is the first step in the batch dependency analysis pipeline. Trigger this skill when the user asks to process `Check-In-Batch-Job.csv` or when you need to ingest the raw batch job data for downstream analysis.
+This skill handles the ingestion of batch job data from a CSV file. It is the first step in the batch dependency analysis pipeline. Trigger this skill when the user asks to process `batch_jobs.csv` or when you need to ingest the raw batch job data for downstream analysis.
 
 ## Instructions (Layer 2)
 When invoked:
-1. Validate that `Check-In-Batch-Job.csv` exists in the workspace.
+1. Validate that `batch_jobs.csv` exists in the workspace.
 2. Execute the `scripts/ingest_csv.py` tool.
 3. The script will read the file, validate that `running time`, `jobid`, and `sql statement` columns exist, and sanitize the data.
 4. The script will output a clean JSON array representing the batch jobs.
