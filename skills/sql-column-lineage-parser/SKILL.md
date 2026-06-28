@@ -1,28 +1,40 @@
 ---
 name: sql-column-lineage-parser
-description: Parses PostgreSQL statements to extract table and column-level read/write operations.
-version: 1.0.0
+description: Parses PostgreSQL statements to extract table-level read/write operations using AST analysis.
+version: 2.0.0
 ---
 
 # Execution Playbook: SQL Column Lineage Parser
 
-As the SQL Column Lineage Parser, your goal is to deterministically parse raw SQL strings into explicit, column-level data access mappings (Reads and Writes).
+As the SQL Column Lineage Parser, your goal is to deterministically parse raw SQL strings into explicit table-level data access mappings (Reads and Writes).
 
 ## 1. Environmental Scan & Pre-flight Check
-- Verify that the `jobs.json` file (produced by Phase 1) exists in the workspace.
-- Verify that the required python package `sqlglot` is installed. If not, notify the Orchestrator or run `pip install -r requirements.txt`.
 
-## 2. Deterministic Extraction (Compute Tools)
-- **Action**: Execute the python parsing tool to evaluate the SQL ASTs.
-- **Command**: `python tools/parse_lineage.py jobs.json`
-- **Redirection**: Save the standard output of this command to a file named `lineage.json` (e.g., `python tools/parse_lineage.py jobs.json > lineage.json`).
+- Verify that `jobs.json` (produced by Phase 1) exists in the workspace.
+- Verify that the required python package `sqlglot` is installed. If not, run `pip install -r requirements.txt`.
 
-## 3. Validation & Assessment
-- Check the contents of `lineage.json`.
-- It must contain a `status: "success"` key and a `lineage` dictionary mapping `jobid` to their `reads` and `writes`.
-- If parsing failed for specific jobs, assess if the output is still viable or if it requires user intervention.
+## 2. SQL Statement Handling
 
-## 4. Final Handover
-- Confirm that `lineage.json` has been successfully created.
-- Summarize any complex queries or parse warnings.
-- Hand control back to the **Master Orchestrator** to proceed to Phase 3 (Dependency Graph Classification).
+The parser handles these DML statement types:
+- **DELETE FROM table** → write to `table`, reads from subquery tables
+- **UPDATE table SET ...** → write to `table`, reads from subquery/join tables
+- **INSERT INTO table** → write to `table`, reads from source tables
+- **SELECT** → reads only (no writes)
+
+Self-referencing detection: If the write target also appears in a subquery, it is correctly classified as a read dependency.
+
+## 3. Deterministic Execution
+
+- **Command:** `python3 skills/sql-column-lineage-parser/tools/parse_lineage.py jobs.json > lineage.json`
+
+## 4. Validation & Assessment
+
+- Output must contain `"status": "success"` and a `lineage` dict mapping jobid → `{reads: [...], writes: [...]}`.
+- Each read/write entry has `{"table": "name", "column": "*"}` (table-level granularity).
+- Report: jobs with reads, jobs with writes, jobs with both, jobs with no lineage.
+
+## 5. Final Handover
+
+- Confirm `lineage.json` created successfully.
+- Summarize any parse warnings or jobs with no detectable lineage.
+- Hand control back to the **Master Orchestrator** for Phase 3.
