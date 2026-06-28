@@ -1,0 +1,7 @@
+{
+  "name": "batch-dependency-analyzer-agent",
+  "version": "1.0.0",
+  "description": "Deterministic end-to-end suite for analyzing PostgreSQL batch jobs and building column-level dependency graphs.",
+  "author": "Antigravity",
+  "contextFileName": "README.md"
+}
