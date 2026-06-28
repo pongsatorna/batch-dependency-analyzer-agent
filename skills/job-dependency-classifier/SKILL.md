@@ -14,7 +14,7 @@ As the Job Dependency Classifier, your goal is to mathematically resolve data li
 
 ## 2. Deterministic Execution (Compute Tools)
 - **Action**: Execute the python graph-building tool to calculate execution tiers.
-- **Command**: `python scripts/classify_dependencies.py lineage.json`
+- **Command**: `python tools/classify_dependencies.py lineage.json`
 - **Capture**: Read the JSON output produced by the script (you may save it to a file or read it directly into your context).
 
 ## 3. Validation & Assessment

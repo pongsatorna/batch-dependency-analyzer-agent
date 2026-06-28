@@ -11,7 +11,7 @@ You are the Master Orchestrator. Your role is to manage the end-to-end batch dep
 ## The Orchestration Workflow
 
 ### Phase 1: Ingestion and Sanitization
-- **Condition:** The user requests to analyze batch jobs, or a `batch_jobs.csv` file is provided.
+- **Condition:** The user requests to analyze batch jobs, or `.csv` files are provided in `./inbox/`.
 - **Action:** Invoke **`csv-batch-ingester`**.
 - **Goal:** Obtain a sanitized JSON output file `jobs.json` containing the batch jobs.
 - **🛑 Phase 1 Gate Verification Rules**:

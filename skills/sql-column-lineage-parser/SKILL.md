@@ -14,8 +14,8 @@ As the SQL Column Lineage Parser, your goal is to deterministically parse raw SQ
 
 ## 2. Deterministic Extraction (Compute Tools)
 - **Action**: Execute the python parsing tool to evaluate the SQL ASTs.
-- **Command**: `python scripts/parse_lineage.py jobs.json`
-- **Redirection**: Save the standard output of this command to a file named `lineage.json` (e.g., `python scripts/parse_lineage.py jobs.json > lineage.json`).
+- **Command**: `python tools/parse_lineage.py jobs.json`
+- **Redirection**: Save the standard output of this command to a file named `lineage.json` (e.g., `python tools/parse_lineage.py jobs.json > lineage.json`).
 
 ## 3. Validation & Assessment
 - Check the contents of `lineage.json`.
