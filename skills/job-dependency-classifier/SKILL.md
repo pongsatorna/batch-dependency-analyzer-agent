@@ -1,24 +1,28 @@
 ---
 name: job-dependency-classifier
 description: Builds a Directed Acyclic Graph (DAG) of job dependencies based on column-level read/write lineages.
+version: 1.0.0
 ---
 
-# `job-dependency-classifier` Skill
+# Execution Playbook: Job Dependency Classifier
 
-## Description (Layer 1)
-This skill constructs a dependency graph (DAG) to determine the exact execution order of batch jobs. It is the final step in the batch dependency analysis pipeline. Trigger this skill when you have extracted the data lineages (reads and writes) from the `sql-column-lineage-parser` and need to resolve which jobs depend on which.
+As the Job Dependency Classifier, your goal is to mathematically resolve data lineage mappings into a Directed Acyclic Graph (DAG), detect circular dependencies, and output safe execution tiers.
 
-## Instructions (Layer 2)
-When invoked:
-1. Ensure you have the lineage JSON output from the parser (e.g., in a file `lineage.json`).
-2. Execute the `scripts/classify_dependencies.py` tool.
-3. The script will use `networkx` to build a DAG:
-   - For every Job A that writes to `Table X` / `Column Y`.
-   - If Job B reads from `Table X` / `Column Y`.
-   - Job B depends on Job A (Edge: A -> B).
-4. The script will output execution tiers (e.g., Tier 1 can run immediately, Tier 2 depends on Tier 1).
-5. Present this final execution graph and tier list to the user as a Markdown artifact or standard output.
+## 1. Environmental Scan & Pre-flight Check
+- Verify that the `lineage.json` file (produced by Phase 2) exists in the workspace.
+- Verify that the required python package `networkx` is installed. If not, notify the Orchestrator or run `pip install -r requirements.txt`.
 
-## Tools (Layer 3)
-- Execute `python skills/job-dependency-classifier/scripts/classify_dependencies.py <path/to/lineage.json>`.
-- Make sure `networkx` is installed via `pip install -r requirements.txt`.
+## 2. Deterministic Execution (Compute Tools)
+- **Action**: Execute the python graph-building tool to calculate execution tiers.
+- **Command**: `python scripts/classify_dependencies.py lineage.json`
+- **Capture**: Read the JSON output produced by the script (you may save it to a file or read it directly into your context).
+
+## 3. Validation & Assessment
+- Check the output from the script.
+- If the status is `error` and a `Circular dependency detected` message is present, immediately halt and present the cycle to the user.
+- If successful, the output will contain an array of `tiers`. Each tier represents jobs that can be executed in parallel during that phase.
+
+## 4. Final Handover
+- The orchestration pipeline is now complete.
+- Format the execution tiers into a clear, readable Markdown artifact (e.g., tables or Mermaid graph) for the user.
+- Hand control back to the **Master Orchestrator** to signal the completion of the lifecycle.

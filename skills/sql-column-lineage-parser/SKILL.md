@@ -1,21 +1,28 @@
 ---
 name: sql-column-lineage-parser
 description: Parses PostgreSQL statements to extract table and column-level read/write operations.
+version: 1.0.0
 ---
 
-# `sql-column-lineage-parser` Skill
+# Execution Playbook: SQL Column Lineage Parser
 
-## Description (Layer 1)
-This skill analyzes PostgreSQL statements and extracts the exact table and column-level data lineage (reads and writes). It is the second step in the batch dependency analysis pipeline. Trigger this skill when you have a set of SQL statements (e.g., from `csv-batch-ingester`) and you need to determine their read/write data dependencies.
+As the SQL Column Lineage Parser, your goal is to deterministically parse raw SQL strings into explicit, column-level data access mappings (Reads and Writes).
 
-## Instructions (Layer 2)
-When invoked:
-1. Ensure the input data (a JSON list of jobs, containing `jobid` and `sql statement`) is available. You can write it to a temporary file like `jobs.json`.
-2. Execute the `scripts/parse_lineage.py` tool, passing the path to the JSON file.
-3. The script will parse the PostgreSQL statements using `sqlglot` and identify which columns and tables are being read (e.g., via `SELECT`) and written to (e.g., via `INSERT`/`UPDATE`).
-4. The script will output a JSON mapping: `jobid -> { "reads": [{"table": "...", "column": "..."}], "writes": [{"table": "...", "column": "..."}] }`.
-5. Capture this output to build the dependency graph in the next phase.
+## 1. Environmental Scan & Pre-flight Check
+- Verify that the `jobs.json` file (produced by Phase 1) exists in the workspace.
+- Verify that the required python package `sqlglot` is installed. If not, notify the Orchestrator or run `pip install -r requirements.txt`.
 
-## Tools (Layer 3)
-- Execute `python skills/sql-column-lineage-parser/scripts/parse_lineage.py <path/to/jobs.json>`.
-- Make sure `sqlglot` is installed via `pip install -r requirements.txt`.
+## 2. Deterministic Extraction (Compute Tools)
+- **Action**: Execute the python parsing tool to evaluate the SQL ASTs.
+- **Command**: `python scripts/parse_lineage.py jobs.json`
+- **Redirection**: Save the standard output of this command to a file named `lineage.json` (e.g., `python scripts/parse_lineage.py jobs.json > lineage.json`).
+
+## 3. Validation & Assessment
+- Check the contents of `lineage.json`.
+- It must contain a `status: "success"` key and a `lineage` dictionary mapping `jobid` to their `reads` and `writes`.
+- If parsing failed for specific jobs, assess if the output is still viable or if it requires user intervention.
+
+## 4. Final Handover
+- Confirm that `lineage.json` has been successfully created.
+- Summarize any complex queries or parse warnings.
+- Hand control back to the **Master Orchestrator** to proceed to Phase 3 (Dependency Graph Classification).
